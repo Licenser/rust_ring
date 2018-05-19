@@ -1,5 +1,5 @@
 -module(ring).
--export([run/0, manager/1]).
+-export([main/1, manager/1]).
 
 -ifdef(DEBUG).
 -define(DBG(F, A), io:format(F, A)).
@@ -7,14 +7,17 @@
 -define(DBG(_F, _A), ok).
 -endif.
 
-run() ->
+main(_) ->
     Tests = [{round(math:pow(10, Procs)), round(math:pow(10, Msgs)), round(math:pow(2, Paralell)), round(math:pow(10, Size))} ||
         Procs <- lists:seq(1, 4),
         Msgs <- lists:seq(1, 4),
-        Paralell <- lists:seq(1, 5),
+        Paralell <- lists:seq(0, 5),
         Size <- lists:seq(1, 5)
         ],
-    manager(Tests).
+    manager(Tests),
+    receive
+        done -> ok
+    end.
 
 setup(Ref, Procs, Msgs) ->
     spawn(fun () -> init_first(Ref, Procs, Msgs) end).
@@ -56,7 +59,8 @@ loop(Msgs, Ref, Next) ->
     end.
 
 manager(Tests) ->
-    spawn(fun() -> manager_loop(Tests) end).
+    Main = self(),
+    spawn(fun() -> manager_loop(Tests), Main ! done end).
 manager_loop(Tests) ->
     register(manager, self()),
     io:format("Running ~p Tests ", [length(Tests)]),
@@ -75,10 +79,9 @@ write_results(F, [{{Procs, Messages, Paralell, Size}, TimeInit, TimeLoop} | R]) 
     write_results(F, R).
 
 manager_loop_1([], Results) ->
-    {ok, F} = file:open("/tmp/results.erlang", [write]),
-    write_results(F, Results),
+    {ok, F} = file:open("results/results.erlang", [write]),
+    write_results(F, lists:reverse(Results)),
     file:close(F),
-    ok = file:write_file("/tmp/results", io_lib:format("~p", [Results])),
     io:format(" All tests done\n");
 manager_loop_1([{Procs, Messages, Paralell, Size} = C | Tests], Results) ->
     io:format("\nRunning ~p procs with ~p messages ~p in paralell of a size of ~p", [Procs, Messages, Paralell, Size]),
