@@ -40,6 +40,7 @@ impl fmt::Display for Result {
         )
     }
 }
+// Generate the benchmark specifications
 pub fn tests() -> Vec<Spec> {
     let max = 4;
     let mut v = Vec::new();

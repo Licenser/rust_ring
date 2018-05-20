@@ -7,11 +7,9 @@ fn main() -> std::io::Result<()> {
     {
         let mut out = File::create("results/results.threads")?;
         for spec in tests {
-            if spec.procs > spec.paralell {
-                println!("Running threads {}.", spec);
-                let r = ring_bench::threads::run(&spec);
-                out.write_fmt(format_args!("{}\n", r))?;
-            }
+            println!("Running threads {}.", spec);
+            let r = ring_bench::threads::run(&spec);
+            out.write_fmt(format_args!("{}\n", r))?;
         }
     }
     println!("done.");
