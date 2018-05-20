@@ -22,7 +22,7 @@
 use super::bench;
 use std::sync::mpsc;
 use std::thread;
-extern crate time;
+use time;
 #[derive(Clone)]
 enum Message {
     InitDone,
