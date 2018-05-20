@@ -1,9 +1,9 @@
 use super::bench;
-use std::thread;
 use std::sync::mpsc;
+use std::thread;
 extern crate time;
 
-pub fn run(spec: bench::Spec) -> bench::Result {
+pub fn run(spec: &bench::Spec) -> bench::Result {
     // Set up test data
     let data = (0..spec.size).map(|_| "x").collect::<String>();
 
@@ -26,15 +26,19 @@ pub fn run(spec: bench::Spec) -> bench::Result {
     }
     let end = time::precise_time_ns();
     t.join().unwrap();
-    bench::Result{
+    bench::Result {
         name: String::from("rust_threads"),
         spec: spec.clone(),
         setup: setup_time,
-        run: end - start
+        run: end - start,
     }
 }
 
-fn init_ring(n: u32, spec: bench::Spec, tx_first: mpsc::Sender<String>) -> (mpsc::Sender<String>, thread::JoinHandle<()>) {
+fn init_ring(
+    n: u32,
+    spec: bench::Spec,
+    tx_first: mpsc::Sender<String>,
+) -> (mpsc::Sender<String>, thread::JoinHandle<()>) {
     let (tx, rx) = mpsc::channel();
     let t = thread::spawn(move || {
         if n > 1 {
@@ -52,5 +56,5 @@ fn init_ring(n: u32, spec: bench::Spec, tx_first: mpsc::Sender<String>) -> (mpsc
             }
         };
     });
-    return (tx.clone(), t);
+    (tx.clone(), t)
 }

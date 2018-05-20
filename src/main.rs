@@ -9,7 +9,7 @@ fn main() -> std::io::Result<()> {
         for spec in tests {
             if spec.procs > spec.paralell {
                 println!("Running threads {}.", spec);
-                let r = ring_bench::threads::run(spec);
+                let r = ring_bench::threads::run(&spec);
                 out.write_fmt(format_args!("{}\n", r))?;
             }
         }

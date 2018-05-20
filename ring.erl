@@ -6,13 +6,13 @@
 -else.
 -define(DBG(_F, _A), ok).
 -endif.
-
+-define(MAX, 3).
 main(_) ->
     Tests = [{round(math:pow(10, Procs)), round(math:pow(10, Msgs)), round(math:pow(2, Paralell)), round(math:pow(10, Size))} ||
-        Procs <- lists:seq(1, 4),
-        Msgs <- lists:seq(1, 4),
-        Paralell <- lists:seq(0, 5),
-        Size <- lists:seq(1, 5)
+        Procs <- lists:seq(1, ?MAX),
+        Msgs <- lists:seq(1, ?MAX),
+        Paralell <- lists:seq(0, ?MAX - 1),
+        Size <- lists:seq(1, ?MAX - 1)
         ],
     manager(Tests),
     receive
@@ -64,13 +64,7 @@ manager(Tests) ->
 manager_loop(Tests) ->
     register(manager, self()),
     io:format("Running ~p Tests ", [length(Tests)]),
-    manager_loop_1(Tests, []),
-    idle().
-idle() ->
-    receive
-        _ ->
-            idle()
-    end.
+    manager_loop_1(Tests, []).
 
 write_results(_F, []) ->
     ok;
