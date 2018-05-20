@@ -5,3 +5,5 @@ authors = ["heinz"]
 
 [dependencies]
 time = "0.1"
+actix = "0.5"
+futures = "0.2.1"
